@@ -1,0 +1,25 @@
+{
+  "name": "arbibot",
+  "version": "0.1.0",
+  "description": "arbitrum arbitrage bot",
+  "main": "index.js",
+  "author": "nobodylabs",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.3",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@openzeppelin/contracts": "^4.4.1",
+    "chai": "^4.3.4",
+    "chalk": "^5.0.0",
+    "dotenv": "^10.0.0",
+    "ethereum-waffle": "^3.4.0",
+    "ethers": "^5.5.2",
+    "fs": "^0.0.1-security",
+    "glob": "^7.2.0",
+    "hardhat": "^2.8.0",
+    "path": "^0.12.7",
+    "solc": "^0.8.11",
+    "util": "^0.12.4"
+  }
+}
