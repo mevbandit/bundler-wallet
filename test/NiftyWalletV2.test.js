@@ -4,7 +4,7 @@ const { deploy, encodeBundle, toEther } = require('../scripts/hardhat.utils');
 
 const { TEST_MNEMONIC } = process.env;
 
-describe('[START] - NiftyWallet.test.js', function () {
+describe('[START] - NiftyWalletV2.test.js', function () {
     before(async () => {
         this.accounts = [];
         for (let i = 0; i < 32; i++) {
@@ -23,7 +23,13 @@ describe('[START] - NiftyWallet.test.js', function () {
         this.nft = await deploy('ERC721PresetMinterPauserAutoId', ['NftOwners', 'NFTO', '']);
         await this.nft.mint(this.signer.address);
 
-        this.bundler = await deploy('NiftyWallet', [this.nft.address, 0]);
+        this.bundler = await deploy('NiftyWalletV2', [this.nft.address, 0]);
+        this.bundler.submitBundle = ({targets, sendValues, calldatas}) => {
+            return this.bundler.signer.sendTransaction({
+                to: this.bundler.address,
+                data: '0x80197d5f' + encodeBundle(targets, sendValues, calldatas).slice(2)
+            });
+        };
     });
 
     it('should transfer tokens to the bundler', async () => {
@@ -38,6 +44,7 @@ describe('[START] - NiftyWallet.test.js', function () {
         const balance = toEther(1000);
         const transferValue = toEther(100);
         const expectedBalance = balance.sub(transferValue.mul(numTransfers));
+        const beforeBalance = await this.token.balanceOf(this.bundler.address);
 
         const bundledTxns = {
             targets: [],
@@ -49,12 +56,11 @@ describe('[START] - NiftyWallet.test.js', function () {
             bundledTxns.sendValues.push(0);
             bundledTxns.calldatas.push(this.transferEncoder([this.accounts[i], transferValue]))
         };
-        const bundle = encodeBundle(bundledTxns.targets, bundledTxns.sendValues, bundledTxns.calldatas);
-        const beforeBalance = await this.token.balanceOf(this.bundler.address);
 
-        const tx = await (await this.signer.sendTransaction({
-            to: this.bundler.address,
-            data: bundle,
+        const tx = await (await this.bundler.submitBundle({
+            targets: bundledTxns.targets,
+            sendValues: bundledTxns.sendValues,
+            calldatas: bundledTxns.calldatas
         })).wait();
         if (0) console.log(tx);
 

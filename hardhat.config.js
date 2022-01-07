@@ -5,6 +5,8 @@ require('./scripts/hardhat.tasks.js');
 const {
     ARB_ONE_URL,
     ARB_RINKEBY_URL,
+    MAINNET_URL,
+    MAINNET_KEY,
     DEV_PRIVATE_KEY,
     TEST_MNEMONIC
 } = process.env;
@@ -17,8 +19,12 @@ module.exports = {
     defaultNetwork: "hardhat",
     networks: {
         hardhat: {
+            // forking: {
+            //     url: MAINNET_URL
+            // },
             // loggingEnabled: true,
             // accounts: [{privateKey: DEV_PRIVATE_KEY, balance: '1000000000000000000000'}]
+            // accounts: [{privateKey: MAINNET_KEY, balance: '1000000000000000000000'}]
         },
         // arbRinkeby: {
         //     accounts: [DEV_PRIVATE_KEY],
@@ -27,7 +33,11 @@ module.exports = {
         // arbOne: {
         //     accounts: [DEV_PRIVATE_KEY],
         //     url: ARB_ONE_URL || 'https://arbitrum.io/rpc',
-        // }
+        // },
+        mainnet: {
+            accounts: [MAINNET_KEY],
+            url: MAINNET_URL
+        }
     },
     paths: {
         sources: "./contracts",

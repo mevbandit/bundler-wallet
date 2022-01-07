@@ -22,27 +22,27 @@ contract Token {
     constructor(uint _totalSupply, address _minter) {
         totalSupply = _totalSupply;
         minter = _minter;
-
         balanceOf[msg.sender] = _totalSupply;
         emit Transfer(address(0), msg.sender, _totalSupply);
     }
 
     function approve(address spender, uint value) public returns (bool) {
-        allowance[msg.sender][spender] = value;
-        emit Approval(msg.sender, spender, value);
+        address sender = msg.sender;
+        allowance[sender][spender] = value;
+        emit Approval(sender, spender, value);
         return true;
     }
 
     function transfer(address to, uint value) public returns (bool) {
-        if (to == address(0)) {
+        if (to == address(0))
             revert TransferToZeroAddress();
-        } else if (balanceOf[msg.sender] < value) {
+        address sender = msg.sender;
+        uint senderBalance = balanceOf[sender];
+        if (senderBalance < value)
             revert ValueExceedsBalance();
-        }
-
-        balanceOf[msg.sender] -= value;
+        balanceOf[sender] = senderBalance - value;
         balanceOf[to] += value;
-        emit Transfer(msg.sender, to, value);
+        emit Transfer(sender, to, value);
         return true;
     }
 
@@ -52,7 +52,6 @@ contract Token {
     {
         if (allowance[from][msg.sender] < value)
             revert ValueExceedsAllowance();
-
         balanceOf[from] -= value;
         balanceOf[to] += value;
         emit Transfer(from, to, value);
@@ -62,7 +61,6 @@ contract Token {
     function mint(address to, uint value) public onlyMinter {
         if (to == address(0))
             revert TransferToZeroAddress();
-
         totalSupply += value;
         balanceOf[to] += value;
         emit Transfer(address(0), to, value);
